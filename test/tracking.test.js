@@ -97,3 +97,18 @@ test("activity estimates use the same rate for each report level", async () => {
   assert.equal(estimatedCost(3600, undefined), null);
   assert.equal(estimatedCost(3600, { salary: 60000, cost_basis: 0 }), null);
 });
+
+test("time breakdown ranks clients and keeps identically named matters separate", async () => {
+  const {timeBreakdown} = await import("../src/reports.js");
+  const rows = [
+    {client:"A",matter:"Admin",seconds:1800},
+    {client:"B",matter:"Admin",seconds:7200},
+    {client:"A",matter:"Admin",seconds:900},
+    {client:"A",matter:"Travel",seconds:900},
+  ];
+  const [first, second] = timeBreakdown(rows);
+  assert.deepEqual([first.client, first.seconds, second.client, second.seconds], ["B",7200,"A",3600]);
+  assert.equal(second.matters.get("Admin"),2700);
+  assert.equal(timeBreakdown(rows.slice(0,1))[0].seconds,1800);
+  assert.deepEqual(timeBreakdown([]),[]);
+});

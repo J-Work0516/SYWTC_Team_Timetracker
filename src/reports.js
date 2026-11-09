@@ -7,6 +7,38 @@ export function estimatedCost(seconds, profile) {
   return ((seconds / 3600) * profile.salary) / profile.cost_basis;
 }
 
+export function timeBreakdown(rows) {
+  const clients = new Map();
+  for (const {client, matter, seconds} of rows) {
+    if (!clients.has(client)) clients.set(client, {client, seconds: 0, matters: new Map()});
+    const group = clients.get(client);
+    group.seconds += seconds;
+    group.matters.set(matter, (group.matters.get(matter) || 0) + seconds);
+  }
+  return [...clients.values()].sort((a, b) => b.seconds - a.seconds || a.client.localeCompare(b.client));
+}
+
+function showBreakdown(parent, rows, total) {
+  if (!total) return;
+  parent.append(el("h3", "Time by client and matter"));
+  for (const group of timeBreakdown(rows)) {
+    const detail = el("details");
+    detail.className = "time-breakdown";
+    const share = (100 * group.seconds / total).toFixed(1) + "%";
+    const summary = el("summary", group.client + " · " + hours(group.seconds) + " h · " + share);
+    const bar = el("progress");
+    bar.max = total;
+    bar.value = group.seconds;
+    bar.setAttribute("aria-hidden", "true");
+    summary.append(bar);
+    detail.append(summary);
+    const matters = [...group.matters].sort(([a, x], [b, y]) => y - x || a.localeCompare(b));
+    table(detail, ["Matter", "Hours", "Share of client time"], matters.map(([matter, seconds]) =>
+      [matter, hours(seconds), group.seconds ? (100 * seconds / group.seconds).toFixed(1) + "%" : "—"]));
+    parent.append(detail);
+  }
+}
+
 export function setupAdmin(request, refreshPersonal) {
 
   let rows = [],
@@ -174,6 +206,7 @@ export function setupAdmin(request, refreshPersonal) {
             " hours have no salary rate and are excluded from the cost.",
         ),
       );
+    showBreakdown($("report"), selected, total);
     const sorted = [...groups.values()].sort((a, b) => {
       if (val.sort === "Most hours") return b.seconds - a.seconds;
       const prop = {

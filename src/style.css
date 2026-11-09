@@ -278,3 +278,85 @@ table, output {
 button:hover:not(:disabled) {
   box-shadow: inset 0 0 0 1px currentColor;
 }
+
+/* The brand rail and workspace form one frame on top of the buildings artwork. */
+body { max-width: 1660px; margin-inline: auto; padding: clamp(12px, 2vw, 32px); display: grid; grid-template-columns: minmax(178px, 208px) minmax(0, 1fr); align-items: start; gap: 14px; }
+aside { position: sticky; inset: auto; top: 20px; width: auto; min-height: 0; padding: 30px 14px; border-radius: 14px; gap: 36px; }
+.brand { width: 84%; }
+main { margin: 0; min-width: 0; padding: 0 clamp(16px, 2.7vw, 40px) 24px; }
+header { min-height: 62px; justify-content: flex-start; }
+.product { color: var(--ink); font-weight: 600; }
+#workspaceRole { margin-left: auto; font-size: 12px; }
+header button { font-size: 12px; }
+.masthead { background: linear-gradient(95deg,#000 3%,rgb(0 0 0 / 55%) 70%,transparent),url("/brand/buildings.webp") center 56% / cover; color: white; padding: clamp(22px,3.4vw,46px); margin-block: 20px 0; border-radius: 10px; }
+.masthead h1 { margin: 0; font-size: clamp(42px,5.3vw,76px); }
+.masthead time { display: block; margin-top: 10px; font-family: Barlow, sans-serif; font-size: 16px; }
+.summary { background: white; color: black; border-radius: 0; border-bottom: 1px solid var(--border); gap: 0; padding: 20px 0 15px; }
+.summary div { padding-inline: clamp(8px,1.7vw,26px); border-left: 1px solid var(--border); }
+.summary div:first-child { padding-left: 0; border-left: 0; }
+.summary small { color: #515151; font-weight: 400; }
+.summary strong { color: black; font: 900 clamp(25px,3.3vw,46px)/1.1 "Big Shoulders Display",sans-serif; margin-top: 5px; }
+.kpi { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-block: 12px; font-size: 13px; }
+progress { accent-color: var(--gold); }
+.kpi progress { width: min(30%,240px); height: 9px; }
+.entry-layout { display: grid; grid-template-columns: 1.12fr 1fr; gap: 16px; align-items: start; }
+article { min-width: 0; padding: clamp(16px,2vw,28px); box-shadow: none; margin: 16px 0 0; }
+.entry-layout article { margin-top: 6px; }
+h2 { font-size: clamp(16px,1.5vw,21px); letter-spacing: .085em; }
+h3 { font-size: 14px; margin: 24px 0 10px; }
+article > p { margin: 0 0 18px; }
+button { background: white; border: 1px solid #b8b8b4; font-weight: 600; min-height: 42px; }
+button.primary, #importPreview button { background: var(--gold); border-color: var(--gold); }
+nav button { background: transparent; border-color: transparent; }
+input, textarea, select { font-weight: 400; min-height: 44px; }
+textarea { min-height: 100px; resize: vertical; }
+label { min-width: 0; }
+#timer output, #running output { display: block; font-size: clamp(32px,3.4vw,50px); line-height: 1; color: black; margin: 0 0 20px; }
+#running:not(:empty) { padding-left: 16px; border-left: 4px solid var(--gold); }
+#running h3 { margin: 0; overflow-wrap:anywhere; }
+#running button { margin-bottom: 6px; }
+fieldset { min-width: 0; }
+fieldset button + button { margin-left: 6px; }
+.report-nav { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 16px; }
+.report-nav button[aria-pressed="true"] { color: white; background: black; border-color: black; }
+.table { max-width: 100%; border-radius: 6px; }
+th { background: #f5f5f3; color: #353535; font-size: 14px; }
+td { font-size: 15px; }
+td, th { overflow-wrap: anywhere; }
+#directory table, #teamHours table { min-width: 560px; }
+#report table { min-width: 390px; }
+#directory td button { min-height: 36px; }
+#profile { border-top: 1px solid var(--border); margin-top: 20px; }
+#report > details, #managed > #teamHours > p { margin-top: 16px; }
+#status:not(:empty) { border-left: 3px solid var(--gold); padding: 10px 12px; background:#faf9f4; color: black; }
+.skip { position: absolute; left: 10px; top: 0; transform: translateY(-150%); z-index: 1; background: black; color: white; padding: 12px; }
+.skip:focus { transform: none; }
+@media (max-width: 1120px) {
+  .entry-layout { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 720px) {
+  body { display: block; padding: 8px; }
+  aside { position: static; min-height: 0; justify-content: space-between; padding: 12px; gap: 10px; margin-bottom: 8px; }
+  .brand { width: 92px; }
+  nav { gap: 3px; }
+  nav button { font-size: 12px; padding: 8px; }
+  main { padding: 0 12px 16px; }
+  header { min-height: 54px; gap: 8px; flex-wrap: wrap; }
+  .product { font-size: 13px; }
+  #workspaceRole { font-size: 11px; }
+  .masthead { margin-top: 12px; padding: 22px 18px; }
+  .kpi { display: grid; }
+  .kpi progress { width: 100%; }
+  .entry-layout { gap: 8px; }
+  .report-nav button { flex: 1 1 80px; font-size: 12px; padding: 6px 8px; }
+  .grid, .pair { grid-template-columns: 1fr; }
+  fieldset { padding: 12px; }
+}
+#reportFilters { border-block: 1px solid var(--border); }
+#reportFilters summary { cursor: pointer; font-weight: 600; padding-block: 12px; }
+#reportFilters[open] > .grid { padding-top: 6px; }
+@media (max-width: 720px) {
+  header { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 8px; padding-block: 6px; }
+  #workspaceRole { grid-column: 1; margin: 0; }
+  #account { grid-column: 2; grid-row: 1 / span 2; }
+}

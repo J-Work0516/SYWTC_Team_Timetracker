@@ -77,7 +77,9 @@ async function startApp() {
     $("running").replaceChildren();
     for (const row of active) {
       const stop = el("button", "Stop timer");
+      stop.className = "primary";
       const display = el("output");
+      display.setAttribute("aria-live","off");
       if (row === active[0]) {
         display.id = "liveElapsed";
       }
@@ -101,6 +103,8 @@ async function startApp() {
       b.day.localeCompare(a.day),
     );
     const today = dayOf(Date.now());
+    $("workDate").dateTime = today;
+    $("workDate").textContent = new Intl.DateTimeFormat("en-US", {timeZone:"America/Chicago", weekday:"long",month:"long",day:"numeric"}).format(new Date());
     for (const [id, prefix] of [
       ["today", today],
       ["month", today.slice(0, 7)],
@@ -115,6 +119,8 @@ async function startApp() {
     }
     const annualHours = rows.filter(r => r.day.startsWith(today.slice(0,4))).reduce((sum,r)=>sum+r.seconds/3600,0);
     $("personalKpi").textContent = annualHours.toFixed(2) + " of " + session.target + " annual target hours (" + (100*annualHours/session.target).toFixed(1) + "%)";
+    $("yearProgress").max = session.target;
+    $("yearProgress").value = Math.min(annualHours, session.target);
     $("history").replaceChildren();
     table(
       $("history"),
@@ -177,6 +183,7 @@ async function startApp() {
     duration.value = value.hours ?? "";
     const save = el("button", "Confirm and save"),
       remove = el("button", "Discard");
+    save.className = "primary";
     box.append(save, remove);
     $("drafts").append(box);
     remove.onclick = () => box.remove();

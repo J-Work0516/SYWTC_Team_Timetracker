@@ -45,6 +45,17 @@ export function setupAdmin(request, refreshPersonal) {
     profiles = [],
     users = [],
     imports = [];
+  $("reportFilters").open = window.matchMedia("(min-width: 721px)").matches;
+  const sectionButtons = document.querySelectorAll(".report-nav button");
+  for (const button of sectionButtons) {
+    button.addEventListener("click", () => {
+      for (const item of sectionButtons) {
+        const selected = item === button;
+        item.setAttribute("aria-pressed", String(selected));
+        $(item.getAttribute("aria-controls")).hidden = !selected;
+      }
+    });
+  }
   const filters = {},
     inputs = {};
   $("adminNav").hidden = false;

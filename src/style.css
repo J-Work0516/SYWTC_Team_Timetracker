@@ -45,8 +45,7 @@ nav {
   display: grid;
   gap: 6px;
 }
-nav button,
-.command {
+nav button {
   background: transparent;
   color: var(--ink);
   text-align: left;
@@ -58,9 +57,6 @@ nav button,
 nav [aria-current="page"] {
   background: var(--ink);
   color: white;
-}
-.command {
-  margin-top: auto;
 }
 main {
   margin-left: 240px;
@@ -226,10 +222,6 @@ fieldset {
   nav {
     display: flex;
     flex-wrap: wrap;
-  }
-  .command {
-    margin: 0;
-    font-size: 12px;
   }
   main {
     margin: 0;

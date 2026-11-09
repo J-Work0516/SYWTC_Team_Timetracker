@@ -280,10 +280,20 @@ button:hover:not(:disabled) {
 }
 
 /* The brand rail and workspace form one frame on top of the buildings artwork. */
-body { max-width: 1660px; margin-inline: auto; padding: clamp(12px, 2vw, 32px); display: grid; grid-template-columns: minmax(178px, 208px) minmax(0, 1fr); align-items: start; gap: 14px; }
-aside { position: sticky; inset: auto; top: 20px; width: auto; min-height: 0; padding: 30px 14px; border-radius: 14px; gap: 36px; }
+body { --frame-inset: clamp(12px, 2vw, 32px); max-width: 1660px; margin-inline: auto; padding: var(--frame-inset); display: grid; grid-template-columns: minmax(178px, 208px) minmax(0, 1fr); align-items: start; gap: 14px; }
+aside {
+  position: sticky;
+  inset: auto;
+  top: var(--frame-inset);
+  width: auto;
+  height: calc(100dvh - 2 * var(--frame-inset));
+  overflow-y: auto;
+  padding: 24px 14px;
+  border-radius: 14px;
+  gap: 24px;
+}
 .brand { width: 84%; }
-main { margin: 0; min-width: 0; padding: 0 clamp(16px, 2.7vw, 40px) 24px; }
+main { margin: 0; min-height: calc(100dvh - 2 * var(--frame-inset)); min-width: 0; padding: 0 clamp(16px, 2.7vw, 40px) 24px; }
 header { min-height: 62px; justify-content: flex-start; }
 .product { color: var(--ink); font-weight: 600; }
 #workspaceRole { margin-left: auto; font-size: 12px; }
@@ -317,7 +327,8 @@ label { min-width: 0; }
 #running button { margin-bottom: 6px; }
 fieldset { min-width: 0; }
 fieldset button + button { margin-left: 6px; }
-.report-nav { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 16px; }
+.report-nav { display: flex; flex-wrap: wrap; gap: 6px; padding-block: clamp(12px, 1.5vw, 22px); }
+#admin > article { margin-top: 0; }
 .report-nav button[aria-pressed="true"] { color: white; background: black; border-color: black; }
 .table { max-width: 100%; border-radius: 6px; }
 th { background: #f5f5f3; color: #353535; font-size: 14px; }
@@ -335,12 +346,12 @@ td, th { overflow-wrap: anywhere; }
   .entry-layout { grid-template-columns: minmax(0,1fr); }
 }
 @media (max-width: 720px) {
-  body { display: block; padding: 8px; }
-  aside { position: static; min-height: 0; justify-content: space-between; padding: 12px; gap: 10px; margin-bottom: 8px; }
+  body { --frame-inset: 8px; display: block; }
+  aside { position: static; height: auto; overflow: visible; justify-content: space-between; padding: 12px; gap: 10px; margin-bottom: var(--frame-inset); }
   .brand { width: 92px; }
   nav { gap: 3px; }
   nav button { font-size: 12px; padding: 8px; }
-  main { padding: 0 12px 16px; }
+  main { min-height: 0; padding: 0 12px 16px; }
   header { min-height: 54px; gap: 8px; flex-wrap: wrap; }
   .product { font-size: 13px; }
   #workspaceRole { font-size: 11px; }

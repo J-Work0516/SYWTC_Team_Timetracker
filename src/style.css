@@ -280,11 +280,10 @@ button:hover:not(:disabled) {
 }
 
 /* The brand rail and workspace form one frame on top of the buildings artwork. */
-body { --frame-inset: clamp(12px, 2vw, 32px); max-width: 1660px; margin-inline: auto; padding: var(--frame-inset); display: grid; grid-template-columns: minmax(178px, 208px) minmax(0, 1fr); align-items: start; gap: 14px; }
+body { --frame-inset: clamp(12px, 2vw, 32px); max-width: 1660px; height: 100dvh; overflow: hidden; grid-template-rows: minmax(0, 1fr); margin-inline: auto; padding: var(--frame-inset); display: grid; grid-template-columns: minmax(178px, 208px) minmax(0, 1fr); align-items: start; gap: 14px; }
 aside {
-  position: sticky;
+  position: relative;
   inset: auto;
-  top: var(--frame-inset);
   width: auto;
   height: calc(100dvh - 2 * var(--frame-inset));
   overflow-y: auto;
@@ -293,7 +292,7 @@ aside {
   gap: 24px;
 }
 .brand { width: 84%; }
-main { margin: 0; min-height: calc(100dvh - 2 * var(--frame-inset)); min-width: 0; padding: 0 clamp(16px, 2.7vw, 40px) 24px; }
+main { margin: 0; height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; min-width: 0; padding: 0 clamp(16px, 2.7vw, 40px) 24px; }
 header { min-height: 62px; justify-content: flex-start; }
 .product { color: var(--ink); font-weight: 600; }
 #workspaceRole { margin-left: auto; font-size: 12px; }
@@ -346,8 +345,8 @@ td, th { overflow-wrap: anywhere; }
   .entry-layout { grid-template-columns: minmax(0,1fr); }
 }
 @media (max-width: 720px) {
-  body { --frame-inset: 8px; display: block; }
-  aside { position: static; height: auto; overflow: visible; justify-content: space-between; padding: 12px; gap: 10px; margin-bottom: var(--frame-inset); }
+  body { --frame-inset: 8px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: var(--frame-inset); }
+  aside { position: static; height: auto; max-height: 45dvh; overflow-y: auto; justify-content: space-between; padding: 12px; gap: 10px; margin-bottom: 0; }
   .brand { width: 92px; }
   nav { gap: 3px; }
   nav button { font-size: 12px; padding: 8px; }
@@ -411,7 +410,7 @@ td, th { overflow-wrap: anywhere; }
 #clockTime { font: 600 15px/1.2 Poppins,sans-serif; font-variant-numeric: tabular-nums; }
 #clockDate { color: var(--gold); font: 13px/1.2 Barlow,sans-serif; }
 #clockDetail { position: absolute; width: max-content; max-width: min(290px, calc(100vw - 16px)); pointer-events: auto; padding: 9px 12px; border-radius: 8px; background: black; color: white; font-size: 12px; }
-body:has(#floatingClock:not([hidden])) { padding-bottom: max(var(--frame-inset), 75px); }
+#main:has(~ #floatingClock:not([hidden])) { padding-bottom: 75px; }
 @media (max-width:720px) {
   #navProfile { flex: 0 0 100%; padding: 8px 0 0; }
 }

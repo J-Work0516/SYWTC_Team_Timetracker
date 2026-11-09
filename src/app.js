@@ -49,6 +49,9 @@ async function startApp() {
   $("profilePosition").textContent = session.position || "Position not set";
   $("navProfile").hidden = false;
   setupClock();
+  document.querySelector("aside nav").addEventListener("click", event => {
+    if (event.target.closest("button")) $("main").scrollTop = 0;
+  });
   const entries = api.entities.TimeEntry;
   let active = [];
   const email = me.email.toLowerCase();

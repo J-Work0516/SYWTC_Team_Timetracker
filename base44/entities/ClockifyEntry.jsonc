@@ -25,34 +25,20 @@
       "type": "string"
     }
   },
-  "required": ["client", "matter", "day", "seconds", "email", "import_key"],
+  "required": [
+    "client",
+    "matter",
+    "day",
+    "seconds",
+    "email",
+    "import_key"
+  ],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
+    "create": false,
     "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.email": "{{user.email}}"
-        }
-      ]
+      "data.email": "{{user.email}}"
     },
-    "update": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
+    "update": false,
+    "delete": false
   }
 }

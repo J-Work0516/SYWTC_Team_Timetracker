@@ -13,7 +13,11 @@
     },
     "work_location": {
       "type": "string",
-      "enum": ["", "US", "Outside US"]
+      "enum": [
+        "",
+        "US",
+        "Outside US"
+      ]
     },
     "salary": {
       "type": "number",
@@ -26,29 +30,30 @@
     "cost_basis": {
       "type": "number",
       "minimum": 1
+    },
+    "access_level": {
+      "type": "string",
+      "enum": [
+        "Employee",
+        "Team Manager",
+        "Full Admin"
+      ]
+    },
+    "manager_email": {
+      "type": "string"
     }
   },
-  "required": ["email", "name", "job_role", "target", "cost_basis"],
+  "required": [
+    "email",
+    "name",
+    "job_role",
+    "target",
+    "cost_basis"
+  ],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "read": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "update": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
+    "create": false,
+    "read": false,
+    "update": false,
+    "delete": false
   }
 }

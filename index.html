@@ -15,7 +15,7 @@
     </aside>
     <main>
       <header>
-        <div>Team workspace</div>
+        <div id="workspaceRole">Team workspace</div>
         <button id="account" hidden>Sign out</button>
       </header>
       <p id="status" role="status">Connecting to your workspace…</p>
@@ -26,6 +26,7 @@
           <div><small>This month</small><strong id="month">0.00 h</strong></div>
           <div><small>This year</small><strong id="year">0.00 h</strong></div>
         </div>
+        <p id="personalKpi"></p>
         <article>
           <h2>Track time</h2>
           <form id="timer">
@@ -71,6 +72,7 @@
           <div id="history"></div>
         </article>
       </section>
+      <section id="managed" hidden><h1>My team</h1><div id="teamHours"></div></section>
       <section id="admin" hidden>
         <h1>Team reports</h1>
         <article>

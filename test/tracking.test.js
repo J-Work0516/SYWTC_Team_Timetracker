@@ -68,13 +68,13 @@ test("salary and historical writes require an administrator", () => {
       ),
     );
   for (const permission of Object.values(schema("TeamProfile").rls))
-    assert.deepEqual(permission, { user_condition: { role: "admin" } });
+    assert.equal(permission, false);
   assert.deepEqual(schema("TimeEntry").rls.update, {
     created_by: "{{user.email}}",
   });
-  assert.deepEqual(schema("ClockifyEntry").rls.create, {
-    user_condition: { role: "admin" },
-  });
+  assert.equal(schema("ClockifyEntry").rls.create, false);
+  assert.deepEqual(schema("TimeEntry").rls.read, {created_by:"{{user.email}}"});
+  assert.deepEqual(schema("ClockifyEntry").rls.read, {"data.email":"{{user.email}}"});
 });
 
 test("daily totals combine matters while keeping each person and date separate", async () => {

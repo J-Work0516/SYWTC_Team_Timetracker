@@ -1,5 +1,5 @@
 import { dayOf, dailyRows, dailyTotals, hours } from "./tracking.js";
-import { $, el, choices, field, table, action, all } from "./ui.js";
+import { $, el, choices, field, table, action } from "./ui.js";
 import { readClockify } from "./import.js";
 
 export function estimatedCost(seconds, profile) {
@@ -7,8 +7,8 @@ export function estimatedCost(seconds, profile) {
   return ((seconds / 3600) * profile.salary) / profile.cost_basis;
 }
 
-export function setupAdmin(api, refreshPersonal) {
-  const { TimeEntry, ClockifyEntry, TeamProfile } = api.entities;
+export function setupAdmin(request, refreshPersonal) {
+
   let rows = [],
     profiles = [],
     users = [],
@@ -78,6 +78,9 @@ export function setupAdmin(api, refreshPersonal) {
     }
     if (key === "target" || key === "cost_basis") input.value = "2000";
   }
+  inputs.access_level = field($("profileFields"), "Tracker access", choices(el("select"), ["Employee","Team Manager","Full Admin"]));
+  inputs.manager_email = field($("profileFields"), "Assigned manager email (optional)", el("input"));
+  inputs.manager_email.type = "email";
   inputs.work_location = field($("profileFields"), "Work location",
     choices(el("select"), ["US", "Outside US"], "Unspecified"));
   action($("profile").querySelector("button"), async () => {
@@ -88,21 +91,15 @@ export function setupAdmin(api, refreshPersonal) {
     data.email = data.email.toLowerCase();
     data.target = Number(data.target);
     data.cost_basis = Number(data.cost_basis);
-    const existing = profiles.find((p) => p.email === data.email);
+
     if (data.salary === "") delete data.salary;
     else data.salary = Number(data.salary);
-    if (existing) await TeamProfile.update(existing.id, data);
-    else await TeamProfile.create(data);
+    await request("saveProfile", {profile:data});
     await load();
     $("status").textContent = "Member details saved.";
   });
   async function load() {
-    const [timed, history, team, accounts] = await Promise.all([
-      all(TimeEntry),
-      all(ClockifyEntry),
-      all(TeamProfile),
-      all(api.entities.User),
-    ]);
+    const {timed,history,team,accounts} = await request("reports");
     imports = history;
     profiles = team;
     users = accounts;
@@ -241,7 +238,7 @@ export function setupAdmin(api, refreshPersonal) {
       if (!directory.has(r.email)) directory.set(r.email, { email: r.email });
     table(
       $("directory"),
-      ["Person", "Role", "Work location", "Hours / target", "Progress", ""],
+      ["Person", "Job title", "Tracker access", "Work location", "Hours / target", "Progress", ""],
       [...directory.values()].filter((p) => !val.location || workLocation(p.email) === val.location).map((p) => {
         const target = p.target || 2000;
         const annual =
@@ -252,12 +249,13 @@ export function setupAdmin(api, refreshPersonal) {
         edit.onclick = () => {
           for (const [key, input] of Object.entries(inputs))
             input.value =
-              p[key] ?? (["target", "cost_basis"].includes(key) ? 2000 : "");
+              p[key] ?? (key === "access_level" ? "Employee" : ["target", "cost_basis"].includes(key) ? 2000 : "");
           inputs.name.focus();
         };
         return [
           p.name || p.email,
           p.job_role || "Role needed",
+          (p.access_level || "Employee") + (p.email === "jim@ashleynicolekirkwood.com" && p.access_level === "Full Admin" ? " (development · review at handoff)" : ""),
           workLocation(p.email),
           annual.toFixed(2) + " / " + target,
           ((annual / target) * 100).toFixed(1) + "%",
@@ -300,11 +298,8 @@ export function setupAdmin(api, refreshPersonal) {
       preview.append(confirm);
       action(confirm, async () => {
         const perform = async () => {
-          const existing = new Set(
-            (await all(ClockifyEntry)).map((r) => r.import_key),
-          );
-          for (const r of pending)
-            if (!existing.has(r.import_key)) await ClockifyEntry.create(r);
+          for (let offset = 0; offset < pending.length; offset += 100)
+            await request("import", {rows:pending.slice(offset,offset+100)});
         };
         if (navigator.locks)
           await navigator.locks.request("sywtc-clockify-import", perform);

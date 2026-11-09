@@ -16,12 +16,10 @@ import {
 import { $, el, choices, field, table, action, all } from "./ui.js";
 import { setupAdmin } from "./reports.js";
 
+import { setupManager } from "./team.js";
+
 async function startApp() {
-  const appId = import.meta.env.VITE_BASE44_APP_ID;
-  if (!appId)
-    throw Error(
-      "Set VITE_BASE44_APP_ID to the private trial app ID and rebuild to open the tracker.",
-    );
+  const appId = import.meta.env.VITE_BASE44_APP_ID || "6af1d93130a72c6351940b12";
   const api = createClient({
     appId,
     token: getAccessToken(),
@@ -38,6 +36,12 @@ async function startApp() {
     $("status").append(sign);
     return;
   }
+  async function request(action, payload = {}) {
+    const {data} = await api.functions.invoke("trackerAccess",{action,...payload});
+    return data;
+  }
+  const session = await request("session");
+  $("workspaceRole").textContent = session.access + " workspace";
   const entries = api.entities.TimeEntry;
   let active = [];
   const email = me.email.toLowerCase();
@@ -108,6 +112,8 @@ async function startApp() {
             .reduce((sum, r) => sum + r.seconds, 0),
         ) + " h";
     }
+    const annualHours = rows.filter(r => r.day.startsWith(today.slice(0,4))).reduce((sum,r)=>sum+r.seconds/3600,0);
+    $("personalKpi").textContent = annualHours.toFixed(2) + " of " + session.target + " annual target hours (" + (100*annualHours/session.target).toFixed(1) + "%)";
     $("history").replaceChildren();
     table(
       $("history"),
@@ -224,7 +230,8 @@ async function startApp() {
     $("dictate").textContent = "Listening…";
   });
   $("status").textContent = "";
-  if (me.role === "admin") setupAdmin(api, refresh);
+  if (session.access === "Full Admin") setupAdmin(request, refresh);
+  if (session.access === "Team Manager") setupManager(request, refresh);
   await refresh();
 }
 startApp().catch((error) => {

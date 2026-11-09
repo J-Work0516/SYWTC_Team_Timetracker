@@ -38,6 +38,35 @@ export function matters(client) {
     return ["Ghana Trip", "Thailand Trip", "Bali Trip", ...admin];
   return admin;
 }
+// Internal catalog numbers; existing and imported entries keep their original names.
+const clientNumbers = new Map(clients.map((name, i) => [name, 1001 + i]));
+const matterNumbers = new Map([
+  ...admin.map((name, i) => [name, 101 + i]),
+  ["Pitch Your Way To Cash Academy", 201],
+  ["Sell Your Way To Cash Challenge", 202],
+  ["Land Corporate Clients Using AI", 203],
+  ["Black Women Sell Live", 204],
+  ["Speak Your Way To Cash Mastermind", 205],
+  ...books.map((name, i) => [name, 301 + i]),
+  ["Ghana Trip", 401],
+  ["Thailand Trip", 402],
+  ["Bali Trip", 403],
+]);
+export function catalogLabel(name) {
+  const number = clientNumbers.get(name) ?? matterNumbers.get(name);
+  return number ? number + " · " + name : name;
+}
+
+export function dailyTotals(rows) {
+  const totals = new Map();
+  for (const { email, day, seconds } of rows) {
+    const key = JSON.stringify([day, email]);
+    const group = totals.get(key) ?? { email, day, seconds: 0 };
+    group.seconds += seconds;
+    totals.set(key, group);
+  }
+  return [...totals.values()];
+}
 export const dayOf = (time) =>
   new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Chicago",

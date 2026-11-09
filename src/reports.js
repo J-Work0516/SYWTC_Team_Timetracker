@@ -1,4 +1,4 @@
-import { dayOf, dailyRows, hours } from "./tracking.js";
+import { dayOf, dailyRows, dailyTotals, hours } from "./tracking.js";
 import { $, el, choices, field, table, action, all } from "./ui.js";
 import { readClockify } from "./import.js";
 
@@ -174,6 +174,19 @@ export function setupAdmin(api, refreshPersonal) {
       }[val.sort];
       return prop ? a[prop].localeCompare(b[prop]) : b.day.localeCompare(a.day);
     });
+    const days = dailyTotals(selected).sort((a, b) => {
+      if (val.sort === "Most hours") return b.seconds - a.seconds;
+      if (val.sort === "Person") return a.email.localeCompare(b.email) || b.day.localeCompare(a.day);
+      const dateOrder = val.sort === "Oldest day" ? a.day.localeCompare(b.day) : b.day.localeCompare(a.day);
+      return dateOrder || a.email.localeCompare(b.email);
+    });
+    $("report").append(el("h3", "Daily hours by team member"));
+    table(
+      $("report"),
+      ["Person", "Date (CT)", "Hours"],
+      days.map((r) => [byEmail.get(r.email)?.name || r.email, r.day, hours(r.seconds)]),
+    );
+    $("report").append(el("h3", "Program and activity costs"));
     table(
       $("report"),
       ["Person", "Date (CT)", "Client", "Matter", "Hours", "Est. cost"],

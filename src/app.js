@@ -5,6 +5,7 @@ import "./style.css";
 import { createClient, getAccessToken } from "@base44/sdk";
 import {
   clients,
+  catalogLabel,
   matters,
   parseVoice,
   dayOf,
@@ -43,9 +44,9 @@ async function startApp() {
   $("account").hidden = false;
   $("account").onclick = () => api.auth.logout(location.origin);
   $("personal").hidden = false;
-  choices($("client"), clients);
+  choices($("client"), clients, null, catalogLabel);
   function setMatters() {
-    choices($("matter"), matters($("client").value), "Choose a matter");
+    choices($("matter"), matters($("client").value), "Choose a matter", catalogLabel);
   }
   setMatters();
   $("client").onchange = setMatters;
@@ -113,7 +114,7 @@ async function startApp() {
       ["Date (CT)", "Client / matter", "Description", "Hours"],
       rows.map((r) => [
         r.day,
-        r.client + " / " + r.matter,
+        catalogLabel(r.client) + " / " + catalogLabel(r.matter),
         r.description,
         hours(r.seconds),
       ]),
@@ -147,11 +148,11 @@ async function startApp() {
     const box = el("fieldset"),
       legend = el("legend", "Review time entry");
     box.append(legend);
-    const client = field(box, "Client", choices(el("select"), clients));
+    const client = field(box, "Client", choices(el("select"), clients, null, catalogLabel));
     client.value = value.client || clients[0];
     const matter = field(box, "Matter", el("select"));
     const update = () =>
-      choices(matter, matters(client.value), "Choose a matter");
+      choices(matter, matters(client.value), "Choose a matter", catalogLabel);
     update();
     matter.value = value.matter || "";
     client.onchange = update;

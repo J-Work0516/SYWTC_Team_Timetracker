@@ -10,10 +10,10 @@ export function field(parent, title, control) {
   parent.append(label);
   return control;
 }
-export function choices(select, values, placeholder) {
+export function choices(select, values, placeholder, label = String) {
   select.replaceChildren();
   if (placeholder) select.add(new Option(placeholder, ""));
-  for (const value of values) select.add(new Option(value, value));
+  for (const value of values) select.add(new Option(label(value), value));
   return select;
 }
 export function table(parent, headers, rows) {

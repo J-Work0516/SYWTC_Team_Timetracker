@@ -76,3 +76,14 @@ test("salary and historical writes require an administrator", () => {
     user_condition: { role: "admin" },
   });
 });
+
+test("daily totals combine matters while keeping each person and date separate", async () => {
+  const { dailyTotals, catalogLabel } = await import("../src/tracking.js");
+  const first = { email: "a@example.org", day: "2026-11-09", seconds: 3600 };
+  const second = { ...first, email: "b@example.org" };
+  const third = { ...first, day: "2026-11-08" };
+  assert.deepEqual(dailyTotals([first, { ...first, matter: "Emails" }, second, third]),
+    [{ ...first, seconds: 7200 }, second, third]);
+  assert.equal(catalogLabel("Ghana Trip"), "401 · Ghana Trip");
+  assert.equal(catalogLabel("Imported project"), "Imported project");
+});

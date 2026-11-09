@@ -21,20 +21,36 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["timer", "manual"]
+      "enum": [
+        "timer",
+        "manual"
+      ]
     },
     "stopped_at": {
       "type": "string"
     }
   },
-  "required": ["client", "matter", "description", "kind", "day"],
+  "required": [
+    "client",
+    "matter",
+    "description",
+    "kind",
+    "day"
+  ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": {
-          "$in": ["user", "admin"]
+      "$or": [
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
         }
-      }
+      ]
     },
     "read": {
       "$or": [

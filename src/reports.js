@@ -2,6 +2,11 @@ import { dayOf, dailyRows, dailyTotals, hours } from "./tracking.js";
 import { $, el, choices, field, table, action, all } from "./ui.js";
 import { readClockify } from "./import.js";
 
+export function estimatedCost(seconds, profile) {
+  if (profile?.salary == null || !(profile.cost_basis > 0)) return null;
+  return ((seconds / 3600) * profile.salary) / profile.cost_basis;
+}
+
 export function setupAdmin(api, refreshPersonal) {
   const { TimeEntry, ClockifyEntry, TeamProfile } = api.entities;
   let rows = [],
@@ -151,13 +156,16 @@ export function setupAdmin(api, refreshPersonal) {
       group.seconds += r.seconds;
       groups.set(key, group);
       total += r.seconds;
-      const p = byEmail.get(r.email);
-      if (p?.salary != null)
-        cost += ((r.seconds / 3600) * p.salary) / p.cost_basis;
+      const estimate = estimatedCost(r.seconds, byEmail.get(r.email));
+      if (estimate !== null) cost += estimate;
       else unpriced += r.seconds;
     }
     const money = (x) =>
       x.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    function displayCost(row) {
+      const estimate = estimatedCost(row.seconds, byEmail.get(row.email));
+      return estimate === null ? "—" : money(estimate);
+    }
     $("report").replaceChildren(
       el("h3", hours(total) + " hours · " + money(cost) + " estimated cost"),
     );
@@ -203,9 +211,7 @@ export function setupAdmin(api, refreshPersonal) {
           r.client,
           r.matter,
           hours(r.seconds),
-          p?.salary != null
-            ? money(((r.seconds / 3600) * p.salary) / p.cost_basis)
-            : "—",
+          displayCost(r),
         ];
       }),
     );
@@ -214,8 +220,11 @@ export function setupAdmin(api, refreshPersonal) {
       detail.append(el("summary", "Activity descriptions"));
       table(
         detail,
-        ["Person", "Day", "Activity", "Hours"],
-        selected.map((r) => [r.email, r.day, r.description, hours(r.seconds)]),
+        ["Person", "Date (CT)", "Client", "Matter", "Activity", "Hours", "Est. cost"],
+        selected.map((r) => [
+          byEmail.get(r.email)?.name || r.email, r.day, r.client, r.matter,
+          r.description, hours(r.seconds), displayCost(r),
+        ]),
       );
       $("report").append(detail);
     }
@@ -224,7 +233,7 @@ export function setupAdmin(api, refreshPersonal) {
     const directory = new Map(
       users.map((u) => [
         u.email.toLowerCase(),
-        { email: u.email.toLowerCase(), name: u.full_name, job_role: u.role },
+        { email: u.email.toLowerCase(), name: u.full_name },
       ]),
     );
     for (const p of profiles) directory.set(p.email, p);

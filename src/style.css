@@ -8,7 +8,9 @@
     system-ui,
     sans-serif;
   color: var(--ink);
-  background: #faf9f6;
+  --rail: 240px;
+  --gutter: clamp(16px, 2.2vw, 36px);
+  background: #171717;
 }
 * {
   box-sizing: border-box;
@@ -19,7 +21,7 @@ body {
 aside {
   position: fixed;
   inset: 0 auto 0 0;
-  width: 240px;
+  width: var(--rail);
   background: linear-gradient(100deg, #e8b900, #ffcf00 75%);
   padding: 34px 18px;
   display: flex;
@@ -59,8 +61,12 @@ nav [aria-current="page"] {
   color: white;
 }
 main {
-  margin-left: 240px;
-  padding: 0 clamp(18px, 5vw, 76px) 50px;
+  margin: var(--gutter) var(--gutter) var(--gutter) calc(var(--rail) + var(--gutter));
+  padding: 0 clamp(18px, 3vw, 48px) 32px;
+  background: #faf9f6;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 28%);
+  display: flow-root;
   max-width: 1550px;
 }
 header,
@@ -107,7 +113,8 @@ article {
   padding: clamp(16px, 3vw, 30px);
   background: white;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px #11111108;
   margin: 18px 0;
 }
 p,
@@ -224,8 +231,9 @@ fieldset {
     flex-wrap: wrap;
   }
   main {
-    margin: 0;
-    padding: 0 14px 28px;
+    margin: 12px 10px;
+    padding: 0 14px 24px;
+    border-radius: 12px;
   }
   header {
     min-height: 50px;

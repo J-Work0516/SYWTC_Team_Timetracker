@@ -87,3 +87,13 @@ test("daily totals combine matters while keeping each person and date separate",
   assert.equal(catalogLabel("Ghana Trip"), "401 · Ghana Trip");
   assert.equal(catalogLabel("Imported project"), "Imported project");
 });
+
+test("activity estimates use the same rate for each report level", async () => {
+  const { estimatedCost } = await import("../src/reports.js");
+  const profile = { salary: 60000, cost_basis: 2000 };
+  assert.equal(estimatedCost(5400, profile), 45);
+  assert.equal(estimatedCost(3600, profile) + estimatedCost(1800, profile), 45);
+  assert.equal(estimatedCost(3600, { salary: 0, cost_basis: 2000 }), 0);
+  assert.equal(estimatedCost(3600, undefined), null);
+  assert.equal(estimatedCost(3600, { salary: 60000, cost_basis: 0 }), null);
+});

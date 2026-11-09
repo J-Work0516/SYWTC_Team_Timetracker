@@ -1,0 +1,50 @@
+{
+  "name": "TeamProfile",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "job_role": {
+      "type": "string"
+    },
+    "salary": {
+      "type": "number",
+      "minimum": 0
+    },
+    "target": {
+      "type": "number",
+      "minimum": 1
+    },
+    "cost_basis": {
+      "type": "number",
+      "minimum": 1
+    }
+  },
+  "required": ["email", "name", "job_role", "target", "cost_basis"],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

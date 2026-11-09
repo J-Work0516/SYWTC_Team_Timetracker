@@ -1,0 +1,292 @@
+import { dayOf, dailyRows, hours } from "./tracking.js";
+import { $, el, choices, field, table, action, all } from "./ui.js";
+import { readClockify } from "./import.js";
+
+export function setupAdmin(api, refreshPersonal) {
+  const { TimeEntry, ClockifyEntry, TeamProfile } = api.entities;
+  let rows = [],
+    profiles = [],
+    users = [],
+    imports = [];
+  const filters = {},
+    inputs = {};
+  $("adminNav").hidden = false;
+  const today = dayOf(Date.now()),
+    year = Number(today.slice(0, 4));
+  const years = Array.from({ length: 6 }, (_, i) => String(year - i));
+  for (const [key, label, options] of [
+    ["person", "Person", []],
+    ["client", "Client", []],
+    ["matter", "Matter", []],
+    ["year", "Year", years],
+    [
+      "month",
+      "Month",
+      Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")),
+    ],
+    [
+      "sort",
+      "Sort by",
+      ["Newest day", "Oldest day", "Person", "Client", "Matter", "Most hours"],
+    ],
+  ]) {
+    filters[key] = field(
+      $("filters"),
+      label,
+      choices(el("select"), options, key === "sort" ? null : "All"),
+    );
+    filters[key].onchange = render;
+  }
+  filters.date = field($("filters"), "Exact day", el("input"));
+  filters.date.type = "date";
+  filters.date.onchange = render;
+  function showAdmin(show) {
+    $("personal").hidden = show;
+    $("admin").hidden = !show;
+    $(show ? "adminNav" : "myNav").setAttribute("aria-current", "page");
+    $(show ? "myNav" : "adminNav").removeAttribute("aria-current");
+  }
+  action($("adminNav"), async () => {
+    showAdmin(true);
+    await load();
+  });
+  action($("myNav"), async () => {
+    showAdmin(false);
+    await refreshPersonal();
+  });
+  for (const [key, label, type] of [
+    ["email", "Team email", "email"],
+    ["name", "Full name", "text"],
+    ["job_role", "Team role", "text"],
+    ["salary", "Annual salary (USD)", "number"],
+    ["target", "Annual KPI hours", "number"],
+    ["cost_basis", "Annual hours for cost estimate", "number"],
+  ]) {
+    const input = field($("profileFields"), label, el("input"));
+    inputs[key] = input;
+    input.type = type;
+    input.required = key !== "salary";
+    if (type === "number") {
+      input.min = key === "salary" ? "0" : "1";
+      input.step = key === "salary" ? "0.01" : "1";
+    }
+    if (key === "target" || key === "cost_basis") input.value = "2000";
+  }
+  action($("profile").querySelector("button"), async () => {
+    if (!$("profile").reportValidity()) return;
+    const data = Object.fromEntries(
+      Object.entries(inputs).map(([key, input]) => [key, input.value.trim()]),
+    );
+    data.email = data.email.toLowerCase();
+    data.target = Number(data.target);
+    data.cost_basis = Number(data.cost_basis);
+    const existing = profiles.find((p) => p.email === data.email);
+    if (data.salary === "") delete data.salary;
+    else data.salary = Number(data.salary);
+    if (existing) await TeamProfile.update(existing.id, data);
+    else await TeamProfile.create(data);
+    await load();
+    $("status").textContent = "Member details saved.";
+  });
+  async function load() {
+    const [timed, history, team, accounts] = await Promise.all([
+      all(TimeEntry),
+      all(ClockifyEntry),
+      all(TeamProfile),
+      all(api.entities.User),
+    ]);
+    imports = history;
+    profiles = team;
+    users = accounts;
+    rows = [
+      ...timed.flatMap((r) =>
+        dailyRows(r).map((x) => ({ ...x, email: r.created_by.toLowerCase() })),
+      ),
+      ...imports,
+    ];
+    for (const [key, values] of Object.entries({
+      person: [
+        ...users.map((u) => u.email.toLowerCase()),
+        ...profiles.map((p) => p.email),
+        ...rows.map((r) => r.email),
+      ],
+      client: rows.map((r) => r.client),
+      matter: rows.map((r) => r.matter),
+    })) {
+      const previous = filters[key].value;
+      choices(filters[key], [...new Set(values)].sort(), "All");
+      filters[key].value = previous;
+    }
+    render();
+  }
+  function render() {
+    const val = Object.fromEntries(
+      Object.entries(filters).map(([k, v]) => [k, v.value]),
+    );
+    const earliest = String(year - 5) + today.slice(4);
+    const selected = rows.filter(
+      (r) =>
+        r.day >= earliest &&
+        r.day <= today &&
+        (!val.person || r.email === val.person) &&
+        (!val.client || r.client === val.client) &&
+        (!val.matter || r.matter === val.matter) &&
+        (!val.year || r.day.startsWith(val.year)) &&
+        (!val.month || r.day.slice(5, 7) === val.month) &&
+        (!val.date || r.day === val.date),
+    );
+    const groups = new Map(),
+      byEmail = new Map(profiles.map((p) => [p.email, p]));
+    let total = 0,
+      cost = 0,
+      unpriced = 0;
+    for (const r of selected) {
+      const key = JSON.stringify([r.email, r.day, r.client, r.matter]);
+      const group = groups.get(key) || { ...r, seconds: 0 };
+      group.seconds += r.seconds;
+      groups.set(key, group);
+      total += r.seconds;
+      const p = byEmail.get(r.email);
+      if (p?.salary != null)
+        cost += ((r.seconds / 3600) * p.salary) / p.cost_basis;
+      else unpriced += r.seconds;
+    }
+    const money = (x) =>
+      x.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    $("report").replaceChildren(
+      el("h3", hours(total) + " hours · " + money(cost) + " estimated cost"),
+    );
+    if (unpriced)
+      $("report").append(
+        el(
+          "p",
+          hours(unpriced) +
+            " hours have no salary rate and are excluded from the cost.",
+        ),
+      );
+    const sorted = [...groups.values()].sort((a, b) => {
+      if (val.sort === "Most hours") return b.seconds - a.seconds;
+      const prop = {
+        Person: "email",
+        Client: "client",
+        Matter: "matter",
+        "Oldest day": "day",
+      }[val.sort];
+      return prop ? a[prop].localeCompare(b[prop]) : b.day.localeCompare(a.day);
+    });
+    table(
+      $("report"),
+      ["Person", "Date (CT)", "Client", "Matter", "Hours", "Est. cost"],
+      sorted.map((r) => {
+        const p = byEmail.get(r.email);
+        return [
+          p?.name || r.email,
+          r.day,
+          r.client,
+          r.matter,
+          hours(r.seconds),
+          p?.salary != null
+            ? money(((r.seconds / 3600) * p.salary) / p.cost_basis)
+            : "—",
+        ];
+      }),
+    );
+    if (selected.length) {
+      const detail = el("details");
+      detail.append(el("summary", "Activity descriptions"));
+      table(
+        detail,
+        ["Person", "Day", "Activity", "Hours"],
+        selected.map((r) => [r.email, r.day, r.description, hours(r.seconds)]),
+      );
+      $("report").append(detail);
+    }
+    const kpiYear = val.year || String(year);
+    $("directory").replaceChildren(el("p", "Annual progress for " + kpiYear));
+    const directory = new Map(
+      users.map((u) => [
+        u.email.toLowerCase(),
+        { email: u.email.toLowerCase(), name: u.full_name, job_role: u.role },
+      ]),
+    );
+    for (const p of profiles) directory.set(p.email, p);
+    for (const r of rows)
+      if (!directory.has(r.email)) directory.set(r.email, { email: r.email });
+    table(
+      $("directory"),
+      ["Person", "Role", "Hours / target", "Progress", ""],
+      [...directory.values()].map((p) => {
+        const target = p.target || 2000;
+        const annual =
+          rows
+            .filter((r) => r.email === p.email && r.day.startsWith(kpiYear))
+            .reduce((s, r) => s + r.seconds, 0) / 3600;
+        const edit = el("button", "Edit");
+        edit.onclick = () => {
+          for (const [key, input] of Object.entries(inputs))
+            input.value =
+              p[key] ?? (["target", "cost_basis"].includes(key) ? 2000 : "");
+          inputs.name.focus();
+        };
+        return [
+          p.name || p.email,
+          p.job_role || "Role needed",
+          annual.toFixed(2) + " / " + target,
+          ((annual / target) * 100).toFixed(1) + "%",
+          edit,
+        ];
+      }),
+    );
+  }
+  $("csv").onchange = async () => {
+    const preview = $("importPreview");
+    preview.replaceChildren();
+    try {
+      const file = $("csv").files[0];
+      if (!file) return;
+      const batch = readClockify(await file.text());
+      const keys = new Set(imports.map((r) => r.import_key));
+      const pending = batch.filter((r) => {
+        if (keys.has(r.import_key)) return false;
+        keys.add(r.import_key);
+        return true;
+      });
+      preview.append(
+        el(
+          "p",
+          pending.length +
+            " new entries · " +
+            (batch.length - pending.length) +
+            " duplicates",
+        ),
+      );
+      if (!pending.length) return;
+      table(
+        preview,
+        ["First entries", "Date", "Client", "Hours"],
+        pending
+          .slice(0, 5)
+          .map((r) => [r.email, r.day, r.client, hours(r.seconds)]),
+      );
+      const confirm = el("button", "Import " + pending.length + " entries");
+      preview.append(confirm);
+      action(confirm, async () => {
+        const perform = async () => {
+          const existing = new Set(
+            (await all(ClockifyEntry)).map((r) => r.import_key),
+          );
+          for (const r of pending)
+            if (!existing.has(r.import_key)) await ClockifyEntry.create(r);
+        };
+        if (navigator.locks)
+          await navigator.locks.request("sywtc-clockify-import", perform);
+        else await perform();
+        preview.replaceChildren(el("p", "Import complete."));
+        $("csv").value = "";
+        await load();
+      });
+    } catch (e) {
+      preview.textContent = e.message;
+    }
+  };
+}

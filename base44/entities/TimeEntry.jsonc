@@ -1,0 +1,60 @@
+{
+  "name": "TimeEntry",
+  "type": "object",
+  "properties": {
+    "client": {
+      "type": "string"
+    },
+    "matter": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "day": {
+      "type": "string",
+      "format": "date"
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["timer", "manual"]
+    },
+    "stopped_at": {
+      "type": "string"
+    }
+  },
+  "required": ["client", "matter", "description", "kind", "day"],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": {
+          "$in": ["user", "admin"]
+        }
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

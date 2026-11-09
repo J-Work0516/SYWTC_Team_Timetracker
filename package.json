@@ -1,0 +1,20 @@
+{
+  "name": "sywtc-team-time-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@base44/sdk": "0.8.59",
+    "@fontsource/poppins": "5.2.7",
+    "@fontsource/bebas-neue": "5.2.7",
+    "papaparse": "5.5.3"
+  },
+  "devDependencies": {
+    "vite": "7.3.1"
+  }
+}

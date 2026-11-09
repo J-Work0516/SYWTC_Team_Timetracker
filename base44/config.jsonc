@@ -1,0 +1,11 @@
+{
+  "name": "SYWTC_2nd_Trial_Week",
+  "description": "Speak Your Way To Cash team time tracker",
+  "visibility": "private",
+  "site": {
+    "installCommand": "npm ci",
+    "buildCommand": "npm run build",
+    "serveCommand": "npm run dev",
+    "outputDirectory": "./dist"
+  }
+}

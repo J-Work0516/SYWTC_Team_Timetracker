@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Team Time Tracker · Speak Your Way To Cash®</title>
+  </head>
+  <body>
+    <aside>
+      <div class="brand">Speak Your Way<br />To Cash<span>®</span></div>
+      <nav aria-label="Workspace">
+        <button id="myNav" aria-current="page">My timesheet</button
+        ><button id="adminNav" hidden>Team reports</button>
+      </nav>
+      <a
+        class="command"
+        href="https://sywtc-command-center-10-49b2c9b3.base44.app"
+        >Command Center ↗</a
+      >
+    </aside>
+    <main>
+      <header>
+        <div>Team workspace</div>
+        <button id="account" hidden>Sign out</button>
+      </header>
+      <p id="status" role="status">Connecting to your workspace…</p>
+      <section id="personal" hidden>
+        <h1>My timesheet</h1>
+        <div class="summary">
+          <div><small>Today</small><strong id="today">0.00 h</strong></div>
+          <div><small>This month</small><strong id="month">0.00 h</strong></div>
+          <div><small>This year</small><strong id="year">0.00 h</strong></div>
+        </div>
+        <article>
+          <h2>Track time</h2>
+          <form id="timer">
+            <div class="pair">
+              <label>Client<select id="client" required></select></label
+              ><label>Matter<select id="matter" required></select></label>
+            </div>
+            <label
+              >Description<input
+                id="description"
+                required
+                maxlength="1500"
+                placeholder="What are you working on?"
+            /></label>
+            <div class="actions">
+              <button class="primary" id="start">Start timer</button
+              ><output id="elapsed">00:00:00</output>
+            </div>
+          </form>
+          <div id="running"></div>
+        </article>
+        <article>
+          <h2>Log past work</h2>
+          <p>
+            Describe each activity with its duration. Review each entry before
+            saving.
+          </p>
+          <label
+            >Work summary<textarea
+              id="speech"
+              placeholder="Two hours on BWSL emails and one hour in a Mastermind meeting"
+            ></textarea>
+          </label>
+          <div class="actions">
+            <button id="dictate">Dictate</button
+            ><button id="review">Review entries</button
+            ><button id="manual">Add manually</button>
+          </div>
+          <div id="drafts"></div>
+        </article>
+        <article>
+          <h2>My time entries</h2>
+          <div id="history"></div>
+        </article>
+      </section>
+      <section id="admin" hidden>
+        <h1>Team reports</h1>
+        <article>
+          <h2>Hours and program costs</h2>
+          <p>
+            Dates use US Central time. Estimated cost uses each person’s annual
+            salary and cost-basis hours.
+          </p>
+          <div id="filters" class="grid"></div>
+          <div id="report"></div>
+        </article>
+        <article>
+          <h2>Team directory & annual targets</h2>
+          <div id="directory"></div>
+          <form id="profile">
+            <h3>Team member details</h3>
+            <div class="grid" id="profileFields"></div>
+            <button class="primary">Save member</button>
+          </form>
+        </article>
+        <article>
+          <h2>Import Clockify history</h2>
+          <p>
+            Use a Detailed Report CSV with email, client, project, description,
+            start date, start time and duration. Export in Central time using
+            ISO or US dates.
+          </p>
+          <label
+            >Clockify CSV<input id="csv" type="file" accept=".csv,text/csv"
+          /></label>
+          <div id="importPreview"></div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

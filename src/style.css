@@ -1,0 +1,241 @@
+:root {
+  --gold: #ffcf00;
+  --ink: #111214;
+  --muted: #616570;
+  --border: #e6e5df;
+  font:
+    14px/1.5 Poppins,
+    system-ui,
+    sans-serif;
+  color: var(--ink);
+  background: #faf9f6;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+aside {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 240px;
+  background: linear-gradient(100deg, #e8b900, #ffcf00 75%);
+  padding: 34px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+}
+.brand,
+h1,
+h2 {
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-weight: 400;
+  line-height: 1;
+}
+.brand {
+  font-size: 34px;
+  letter-spacing: 0.6px;
+}
+.brand span {
+  font: 13px Poppins;
+  vertical-align: top;
+}
+nav {
+  display: grid;
+  gap: 6px;
+}
+nav button,
+.command {
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  border: 0;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+nav [aria-current="page"] {
+  background: var(--ink);
+  color: white;
+}
+.command {
+  margin-top: auto;
+}
+main {
+  margin-left: 240px;
+  padding: 0 clamp(18px, 5vw, 76px) 50px;
+  max-width: 1550px;
+}
+header,
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+header {
+  min-height: 70px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+h1 {
+  font-size: clamp(48px, 6vw, 78px);
+  margin: 30px 0 20px;
+}
+h2 {
+  font-size: 32px;
+  margin: 0 0 16px;
+}
+h3 {
+  font-size: 16px;
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #171717;
+  color: white;
+  padding: 22px;
+  border-radius: 12px;
+  gap: 15px;
+}
+.summary small {
+  color: #ddd;
+}
+.summary strong {
+  display: block;
+  color: var(--gold);
+  font-size: clamp(18px, 3vw, 34px);
+}
+article {
+  padding: clamp(16px, 3vw, 30px);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 18px 0;
+}
+p,
+small {
+  color: var(--muted);
+}
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  border: 1px solid #c4c3be;
+  border-radius: 6px;
+  background: white;
+  padding: 9px 15px;
+  color: var(--ink);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.pair,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 0 16px;
+}
+label {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+input,
+select,
+textarea {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #bcbcb8;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  min-width: 0;
+}
+textarea {
+  min-height: 70px;
+}
+output {
+  font: 24px monospace;
+}
+.table {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+th,
+td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th {
+  font-size: 12px;
+  color: #555;
+}
+fieldset {
+  border: 1px solid var(--border);
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 6px;
+}
+#status:empty {
+  display: none;
+}
+[hidden] {
+  display: none !important;
+}
+:focus-visible {
+  outline: 3px solid #2b69a0;
+  outline-offset: 2px;
+}
+@media (max-width: 720px) {
+  aside {
+    position: static;
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 15px;
+  }
+  .brand {
+    font-size: 22px;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .command {
+    margin: 0;
+    font-size: 12px;
+  }
+  main {
+    margin: 0;
+    padding: 0 14px 28px;
+  }
+  header {
+    min-height: 50px;
+  }
+}

@@ -22,6 +22,7 @@ async function startApp() {
   const appId = import.meta.env.VITE_BASE44_APP_ID || "6af1d93130a72c6351940b12";
   const api = createClient({
     appId,
+    serverUrl: import.meta.env.DEV ? "https://sywtc-2nd-trial-week-51940b12.base44.app" : location.origin,
     token: getAccessToken(),
     appBaseUrl: location.origin,
   });

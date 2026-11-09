@@ -16,6 +16,7 @@ export function setupAdmin(api, refreshPersonal) {
   const years = Array.from({ length: 6 }, (_, i) => String(year - i));
   for (const [key, label, options] of [
     ["person", "Person", []],
+    ["location", "Work location", ["Outside US", "US", "Unspecified"]],
     ["client", "Client", []],
     ["matter", "Matter", []],
     ["year", "Year", years],
@@ -72,6 +73,8 @@ export function setupAdmin(api, refreshPersonal) {
     }
     if (key === "target" || key === "cost_basis") input.value = "2000";
   }
+  inputs.work_location = field($("profileFields"), "Work location",
+    choices(el("select"), ["US", "Outside US"], "Unspecified"));
   action($("profile").querySelector("button"), async () => {
     if (!$("profile").reportValidity()) return;
     const data = Object.fromEntries(
@@ -124,19 +127,21 @@ export function setupAdmin(api, refreshPersonal) {
       Object.entries(filters).map(([k, v]) => [k, v.value]),
     );
     const earliest = String(year - 5) + today.slice(4);
+    const byEmail = new Map(profiles.map((p) => [p.email, p]));
+    const workLocation = (email) => byEmail.get(email)?.work_location || "Unspecified";
     const selected = rows.filter(
       (r) =>
         r.day >= earliest &&
         r.day <= today &&
         (!val.person || r.email === val.person) &&
+        (!val.location || workLocation(r.email) === val.location) &&
         (!val.client || r.client === val.client) &&
         (!val.matter || r.matter === val.matter) &&
         (!val.year || r.day.startsWith(val.year)) &&
         (!val.month || r.day.slice(5, 7) === val.month) &&
         (!val.date || r.day === val.date),
     );
-    const groups = new Map(),
-      byEmail = new Map(profiles.map((p) => [p.email, p]));
+    const groups = new Map();
     let total = 0,
       cost = 0,
       unpriced = 0;
@@ -227,8 +232,8 @@ export function setupAdmin(api, refreshPersonal) {
       if (!directory.has(r.email)) directory.set(r.email, { email: r.email });
     table(
       $("directory"),
-      ["Person", "Role", "Hours / target", "Progress", ""],
-      [...directory.values()].map((p) => {
+      ["Person", "Role", "Work location", "Hours / target", "Progress", ""],
+      [...directory.values()].filter((p) => !val.location || workLocation(p.email) === val.location).map((p) => {
         const target = p.target || 2000;
         const annual =
           rows
@@ -244,6 +249,7 @@ export function setupAdmin(api, refreshPersonal) {
         return [
           p.name || p.email,
           p.job_role || "Role needed",
+          workLocation(p.email),
           annual.toFixed(2) + " / " + target,
           ((annual / target) * 100).toFixed(1) + "%",
           edit,

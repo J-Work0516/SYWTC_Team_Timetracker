@@ -11,6 +11,10 @@
     "job_role": {
       "type": "string"
     },
+    "work_location": {
+      "type": "string",
+      "enum": ["", "US", "Outside US"]
+    },
     "salary": {
       "type": "number",
       "minimum": 0

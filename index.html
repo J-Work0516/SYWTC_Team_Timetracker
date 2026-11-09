@@ -14,6 +14,10 @@
         <button id="myNav" aria-current="page">My timesheet</button
         ><button id="adminNav" hidden>Team reports</button>
       </nav>
+      <div id="navProfile" hidden>
+        <strong id="profileName"></strong>
+        <span id="profilePosition"></span>
+      </div>
     </aside>
     <main id="main" tabindex="-1">
       <header>
@@ -118,6 +122,12 @@
         </article>
       </section>
     </main>
+    <div id="floatingClock" hidden>
+      <div id="clockDetail" hidden></div>
+      <button type="button" id="clockFace" aria-controls="clockDetail" aria-expanded="false" title="Time Tracker clock · drag to move">
+        <span id="clockTime"></span><span id="clockDate"></span>
+      </button>
+    </div>
     <script type="module" src="/src/app.js"></script>
   </body>
 </html>

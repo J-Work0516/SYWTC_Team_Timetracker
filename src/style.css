@@ -371,3 +371,47 @@ td, th { overflow-wrap: anywhere; }
   #workspaceRole { grid-column: 1; margin: 0; }
   #account { grid-column: 2; grid-row: 1 / span 2; }
 }
+
+#navProfile {
+  margin-top: auto;
+  display: grid;
+  gap: 2px;
+  padding: 14px 6px 0;
+  border-top: 1px solid #0005;
+  overflow-wrap: anywhere;
+}
+#profilePosition { font-size: 13px; }
+#floatingClock {
+  position: fixed;
+  z-index: 3;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+  max-width: calc(100vw - 16px);
+  pointer-events: none;
+}
+#clockFace {
+  display: grid;
+  gap: 1px;
+  min-width: 94px;
+  padding: 8px 14px;
+  color: white;
+  background: black;
+  border: 2px solid var(--gold);
+  border-radius: 28px;
+  box-shadow: 0 3px 12px #0004;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  pointer-events: auto;
+}
+#clockFace:active { cursor: grabbing; }
+#clockTime { font: 600 15px/1.2 Poppins,sans-serif; font-variant-numeric: tabular-nums; }
+#clockDate { color: var(--gold); font: 13px/1.2 Barlow,sans-serif; }
+#clockDetail { padding: 9px 12px; border-radius: 8px; background: black; color: white; font-size: 12px; }
+body:has(#floatingClock:not([hidden])) { padding-bottom: max(var(--frame-inset), 75px); }
+@media (max-width:720px) {
+  #navProfile { flex: 0 0 100%; padding: 8px 0 0; }
+}

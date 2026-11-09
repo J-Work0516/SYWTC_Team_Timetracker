@@ -30,7 +30,11 @@ export async function trackerAction(user, db, body) {
   if (profiles.length > 1) reject(409, "Duplicate team profiles need administrator review.");
   const own = profiles[0];
   const access = roleOf(email, own);
-  if (body.action === "session") return {access, target:own?.target || 2000};
+  if (body.action === "session") {
+    const name = own?.name?.trim() || initialAdmins.get(email) || user.full_name?.trim() || email;
+    const position = own?.job_role?.trim() || (email === "jim" + domain ? "AI Engineer" : "");
+    return {access, target:own?.target || 2000, name, position};
+  }
 
   if (body.action === "team") {
     if (access !== "Team Manager") reject(403, "Team Manager access required.");

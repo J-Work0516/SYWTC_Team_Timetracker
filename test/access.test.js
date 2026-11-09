@@ -14,7 +14,7 @@ function entity(rows = []) {
 function database() {
   return {TeamProfile:entity([
     {id:"1",email:user("supervisor").email,access_level:"Team Manager"},
-    {id:"2",email:user("worker").email,manager_email:user("supervisor").email,salary:98765,target:1900},
+    {id:"2",email:user("worker").email,manager_email:user("supervisor").email,name:"Team member",job_role:"Coordinator",salary:98765,target:1900},
     {id:"3",email:user("other").email,job_role:"CEO"},
   ]), TimeEntry:entity([{created_by:user("worker").email,description:"Assigned work"},{created_by:user("other").email,description:"Outside team"}]),
   ClockifyEntry:entity(),User:entity()};
@@ -44,5 +44,5 @@ test("admin can end development access and employee gets only own target",async(
   const db=database();
   await trackerAction(user("ashley"),db,{action:"saveProfile",profile:{email:user("jim").email,name:"Jim",job_role:"AI Engineer",access_level:"Employee",target:2000,cost_basis:2000}});
   await assert.rejects(trackerAction(user("jim"),db,{action:"reports"}),{status:403});
-  assert.deepEqual(await trackerAction(user("worker"),db,{action:"session",email:user("ashley").email}),{access:"Employee",target:1900});
+  assert.deepEqual(await trackerAction(user("worker"),db,{action:"session",email:user("ashley").email}),{access:"Employee",target:1900,name:"Team member",position:"Coordinator"});
 });

@@ -18,6 +18,8 @@ import { setupAdmin } from "./reports.js";
 
 import { setupManager } from "./team.js";
 
+import { setupClock } from "./clock.js";
+
 async function startApp() {
   const appId = import.meta.env.VITE_BASE44_APP_ID || "6af1d93130a72c6351940b12";
   const api = createClient({
@@ -43,6 +45,10 @@ async function startApp() {
   }
   const session = await request("session");
   $("workspaceRole").textContent = session.access + " workspace";
+  $("profileName").textContent = session.name || me.full_name || me.email;
+  $("profilePosition").textContent = session.position || "Position not set";
+  $("navProfile").hidden = false;
+  setupClock();
   const entries = api.entities.TimeEntry;
   let active = [];
   const email = me.email.toLowerCase();

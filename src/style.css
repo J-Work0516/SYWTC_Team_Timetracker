@@ -410,8 +410,12 @@ td, th { overflow-wrap: anywhere; }
 #clockFace:active { cursor: grabbing; }
 #clockTime { font: 600 15px/1.2 Poppins,sans-serif; font-variant-numeric: tabular-nums; }
 #clockDate { color: var(--gold); font: 13px/1.2 Barlow,sans-serif; }
-#clockDetail { padding: 9px 12px; border-radius: 8px; background: black; color: white; font-size: 12px; }
+#clockDetail { position: absolute; width: max-content; max-width: min(290px, calc(100vw - 16px)); pointer-events: auto; padding: 9px 12px; border-radius: 8px; background: black; color: white; font-size: 12px; }
 body:has(#floatingClock:not([hidden])) { padding-bottom: max(var(--frame-inset), 75px); }
 @media (max-width:720px) {
   #navProfile { flex: 0 0 100%; padding: 8px 0 0; }
 }
+
+#clockDetail strong, #clockDetail span { display: block; }
+#localZone { color: var(--gold); }
+#clockDetail::after { content: ""; position: absolute; inset: -4px 0; }

@@ -2,10 +2,11 @@ import { $ } from "./ui.js";
 
 export function setupClock() {
   const widget = $("floatingClock"), button = $("clockFace"), detail = $("clockDetail");
-  const zone = {timeZone:"America/Chicago"};
-  const time = new Intl.DateTimeFormat("en-US", {...zone, hour:"numeric", minute:"2-digit"});
-  const date = new Intl.DateTimeFormat("en-US", {...zone, month:"short", day:"numeric"});
-  const full = new Intl.DateTimeFormat("en-US", {...zone, dateStyle:"full"});
+  const eastern = {timeZone:"America/New_York"};
+  const time = new Intl.DateTimeFormat("en-US", {...eastern, hour:"numeric", minute:"2-digit"});
+  const date = new Intl.DateTimeFormat("en-US", {...eastern, month:"short", day:"numeric"});
+  const abbreviation = new Intl.DateTimeFormat("en-US", {...eastern, timeZoneName:"short"});
+  let pinned = false;
   let moved = false;
   let start;
   let manualPosition = false;
@@ -14,8 +15,16 @@ export function setupClock() {
   function update() {
     const now = new Date();
     $("clockTime").textContent = time.format(now);
-    $("clockDate").textContent = date.format(now) + " · CT";
-    detail.textContent = full.format(now) + " · US Central time";
+    const zoneName = abbreviation.formatToParts(now).find(part => part.type === "timeZoneName").value;
+    $("clockDate").textContent = date.format(now) + " · " + zoneName;
+    const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const local = new Intl.DateTimeFormat("en-US", {
+      timeZone:localZone, dateStyle:"full", timeStyle:"short",
+    });
+    const label = localZone === "Asia/Manila" ? "Philippine time" : localZone.replaceAll("_", " ");
+    $("localZone").textContent = "Your local time · " + label;
+    $("localDateTime").textContent = local.format(now);
+    positionDetail();
     clearTimeout(nextMinute);
     nextMinute = setTimeout(update, 60000 - now.getTime() % 60000);
   }
@@ -27,6 +36,7 @@ export function setupClock() {
     widget.style.bottom = "auto";
     widget.style.right = "auto";
     manualPosition = true;
+    positionDetail();
   }
   function fit() {
     if (manualPosition) {
@@ -34,11 +44,32 @@ export function setupClock() {
       place(rect.left, rect.top);
     }
   }
+  function positionDetail() {
+    if (detail.hidden) return;
+    const face = button.getBoundingClientRect();
+    const left = Math.max(8, Math.min(face.right - detail.offsetWidth, window.innerWidth - detail.offsetWidth - 8));
+    detail.style.left = (left - face.left) + "px";
+    detail.style.top = face.top >= detail.offsetHeight + 12
+      ? (-detail.offsetHeight - 4) + "px" : (face.height + 4) + "px";
+  }
   function expand(open) {
     detail.hidden = !open;
     button.setAttribute("aria-expanded", String(open));
-    fit();
+    positionDetail();
   }
+  widget.addEventListener("pointerenter", e => {
+    if (e.pointerType === "mouse") expand(true);
+  });
+  widget.addEventListener("pointerleave", () => {
+    if (!pinned && !button.matches(":focus-visible")) expand(false);
+  });
+  button.addEventListener("focus", () => {
+    if (button.matches(":focus-visible")) expand(true);
+  });
+  button.addEventListener("blur", () => { pinned = false; expand(false); });
+  document.addEventListener("pointerdown", e => {
+    if (!widget.contains(e.target)) { pinned = false; expand(false); }
+  });
   button.addEventListener("pointerdown", e => {
     if (!e.isPrimary || e.button !== 0) return;
     const rect = widget.getBoundingClientRect();
@@ -51,15 +82,17 @@ export function setupClock() {
     const dx = e.clientX - start.x, dy = e.clientY - start.y;
     if (!moved && Math.hypot(dx, dy) < 5) return;
     moved = true;
+    pinned = false;
+    expand(false);
     place(start.left + dx, start.top + dy);
   });
   button.addEventListener("lostpointercapture", () => { start = undefined; });
   button.addEventListener("click", e => {
-    if (!moved || e.detail === 0) expand(detail.hidden);
+    if (!moved || e.detail === 0) { pinned = !pinned; expand(pinned); }
     moved = false;
   });
   button.addEventListener("keydown", e => {
-    if (e.key === "Escape") expand(false);
+    if (e.key === "Escape") { pinned = false; expand(false); }
     const offsets = {ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]};
     if (offsets[e.key]) {
       e.preventDefault();
@@ -71,5 +104,5 @@ export function setupClock() {
   widget.hidden = false;
   update();
   document.addEventListener("visibilitychange", update);
-  window.addEventListener("resize", fit);
+  window.addEventListener("resize", () => { fit(); positionDetail(); });
 }

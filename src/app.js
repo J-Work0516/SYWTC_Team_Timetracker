@@ -9,6 +9,7 @@ import {
   matters,
   parseVoice,
   dayOf,
+  WORK_TIME_ZONE,
   dailyRows,
   hours,
   clock,
@@ -113,7 +114,7 @@ async function startApp() {
     );
     const today = dayOf(Date.now());
     $("workDate").dateTime = today;
-    $("workDate").textContent = new Intl.DateTimeFormat("en-US", {timeZone:"America/Chicago", weekday:"long",month:"long",day:"numeric"}).format(new Date());
+    $("workDate").textContent = new Intl.DateTimeFormat("en-US", {timeZone:WORK_TIME_ZONE, weekday:"long",month:"long",day:"numeric"}).format(new Date());
     for (const [id, prefix] of [
       ["today", today],
       ["month", today.slice(0, 7)],
@@ -133,7 +134,7 @@ async function startApp() {
     $("history").replaceChildren();
     table(
       $("history"),
-      ["Date (CT)", "Client / matter", "Description", "Hours"],
+      ["Date (ET)", "Client / matter", "Description", "Hours"],
       rows.map((r) => [
         r.day,
         catalogLabel(r.client) + " / " + catalogLabel(r.matter),
@@ -181,7 +182,7 @@ async function startApp() {
     const desc = field(box, "Description", el("input"));
     desc.value = value.description || "";
     desc.maxLength = 1500;
-    const date = field(box, "Work date (CT)", el("input"));
+    const date = field(box, "Work date (ET)", el("input"));
     date.type = "date";
     date.value = date.max = dayOf(Date.now());
     const duration = field(box, "Hours", el("input"));

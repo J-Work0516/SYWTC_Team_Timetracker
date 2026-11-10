@@ -1,6 +1,6 @@
 # SYWTC Team Time Tracker
 
-First deliverable in the second trial. Team members select a client and matter, describe the activity, and run a timer or confirm individual entries from a spoken or typed summary. Full Admins can review daily activity, edit directory records, see annual KPI progress and estimated program costs, and preview Clockify Detailed Report CSVs before importing. All work dates use America/Chicago. Annual salary is assumed to be USD. The default annual cost basis is 2,000 hours and is editable independently of the KPI target. Estimates apply the currently entered salary to historical hours.
+First deliverable in the second trial. Team members select a client and matter, describe the activity, and run a timer or confirm individual entries from a spoken or typed summary. Full Admins can review daily activity, edit directory records, see annual KPI progress and estimated program costs, and preview Clockify Detailed Report CSVs before importing. Work dates and reporting periods use US Eastern time (America/New_York), including daylight saving. Timestamped timers are allocated by Eastern midnight. Manual and imported date-only records retain their assigned work dates. Export new Clockify CSVs in Eastern time. Annual salary is assumed to be USD. The default annual cost basis is 2,000 hours and is editable independently of the KPI target. Estimates apply the currently entered salary to historical hours.
 
 ## Run and deploy
 

@@ -237,13 +237,13 @@ export function setupAdmin(request, refreshPersonal) {
     $("report").append(el("h3", "Daily hours by team member"));
     table(
       $("report"),
-      ["Person", "Date (CT)", "Hours"],
+      ["Person", "Date (ET)", "Hours"],
       days.map((r) => [byEmail.get(r.email)?.name || r.email, r.day, hours(r.seconds)]),
     );
     $("report").append(el("h3", "Program and activity costs"));
     table(
       $("report"),
-      ["Person", "Date (CT)", "Client", "Matter", "Hours", "Est. cost"],
+      ["Person", "Date (ET)", "Client", "Matter", "Hours", "Est. cost"],
       sorted.map((r) => {
         const p = byEmail.get(r.email);
         return [
@@ -261,7 +261,7 @@ export function setupAdmin(request, refreshPersonal) {
       detail.append(el("summary", "Activity descriptions"));
       table(
         detail,
-        ["Person", "Date (CT)", "Client", "Matter", "Activity", "Hours", "Est. cost"],
+        ["Person", "Date (ET)", "Client", "Matter", "Activity", "Hours", "Est. cost"],
         selected.map((r) => [
           byEmail.get(r.email)?.name || r.email, r.day, r.client, r.matter,
           r.description, hours(r.seconds), displayCost(r),

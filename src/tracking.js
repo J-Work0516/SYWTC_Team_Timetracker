@@ -67,13 +67,14 @@ export function dailyTotals(rows) {
   }
   return [...totals.values()];
 }
-export const dayOf = (time) =>
-  new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Chicago",
+export const WORK_TIME_ZONE = "America/New_York";
+const workDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: WORK_TIME_ZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date(time));
+  });
+export const dayOf = time => workDate.format(new Date(time));
 export const hours = (seconds) => (seconds / 3600).toFixed(2);
 export function clock(seconds) {
   return [
@@ -84,7 +85,7 @@ export function clock(seconds) {
     .map((x) => String(x).padStart(2, "0"))
     .join(":");
 }
-// Timed sessions are allocated to each Central calendar day, including DST transitions.
+// Timed sessions are allocated to each Eastern calendar day, including DST transitions.
 export function dailyRows(entry) {
   if (entry.kind !== "timer") return [entry];
   if (!entry.stopped_at) return [];

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { clients, matters, parseVoice, dailyRows } from "../src/tracking.js";
+import { clients, matters, parseVoice, dailyRows, dayOf } from "../src/tracking.js";
 import { readClockify } from "../src/import.js";
 import { readFileSync } from "node:fs";
 test("all clients, seven books and the written trip catalog", () => {
@@ -28,11 +28,11 @@ test("Ashley’s spoken example yields two separately confirmable rows", () => {
   assert.equal(parseVoice("30 minutes on Jamaica retreat")[0].hours, 0.5);
   assert.equal(parseVoice("1 hour on something unfamiliar")[0].matter, "");
 });
-test("Central daylight saving transition and overnight allocation", () => {
+test("Eastern daylight saving transition and overnight allocation", () => {
   const rows = dailyRows({
     kind: "timer",
-    created_date: "2026-11-01T04:30:00Z",
-    stopped_at: "2026-11-02T06:30:00Z",
+    created_date: "2026-11-01T03:30:00Z",
+    stopped_at: "2026-11-02T05:30:00Z",
   });
   assert.deepEqual(
     rows.map((r) => [r.day, r.seconds]),
@@ -43,6 +43,16 @@ test("Central daylight saving transition and overnight allocation", () => {
     ],
   );
   assert.deepEqual(dailyRows({ kind: "timer" }), []);
+});
+test("Eastern year boundary and the 23-hour spring-forward day", () => {
+  assert.equal(dayOf("2027-01-01T04:59:59Z"), "2026-12-31");
+  assert.equal(dayOf("2027-01-01T05:00:00Z"), "2027-01-01");
+  const rows = dailyRows({
+    kind: "timer", created_date: "2026-03-08T04:30:00Z", stopped_at: "2026-03-09T04:30:00Z",
+  });
+  assert.deepEqual(rows.map(r => [r.day, r.seconds]), [
+    ["2026-03-07", 1800], ["2026-03-08", 82800], ["2026-03-09", 1800],
+  ]);
 });
 const csv =
   'Email,Start Date,Start Time,Client,Project,Description,Duration (h)\nmember@example.com,11/03/2026,09:00,Example,Planning,"Prep, review",01:15:00';

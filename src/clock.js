@@ -1,8 +1,9 @@
+import { WORK_TIME_ZONE } from "./tracking.js";
 import { $ } from "./ui.js";
 
 export function setupClock() {
   const widget = $("floatingClock"), button = $("clockFace"), detail = $("clockDetail");
-  const eastern = {timeZone:"America/New_York"};
+  const eastern = {timeZone:WORK_TIME_ZONE};
   const time = new Intl.DateTimeFormat("en-US", {...eastern, hour:"numeric", minute:"2-digit"});
   const date = new Intl.DateTimeFormat("en-US", {...eastern, month:"short", day:"numeric"});
   const abbreviation = new Intl.DateTimeFormat("en-US", {...eastern, timeZoneName:"short"});

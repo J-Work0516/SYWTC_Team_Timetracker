@@ -1,6 +1,7 @@
 // SYWTC floating clock: the same file is used in every Speak Your Way To Cash workspace app.
 // Shows the viewer's local time by default. Click it to see company (New York) time and to pick another
 // timezone; the choice is remembered on this device. Drag it (or use the arrow keys) to move it.
+// Styles are scoped to #sywtcClock so an app's own button/select styles can't change how the clock looks.
 const STORE_KEY = "sywtc.clock.timezone";
 export const COMPANY_TIME_ZONE = "America/New_York";
 const COMMON_ZONES = [
@@ -35,29 +36,29 @@ const zoneAbbr = (zone, date) =>
   new Intl.DateTimeFormat("en-US", {timeZone: zone, timeZoneName: "short"}).formatToParts(date).find(p => p.type === "timeZoneName")?.value ?? "";
 
 const CSS = `
-.sywtc-clock{position:fixed;z-index:60;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));font-family:Poppins,system-ui,sans-serif;line-height:1.3;pointer-events:none}
-.sywtc-clock *{box-sizing:border-box}
-.sywtc-clock__face{all:unset;box-sizing:border-box;display:grid;gap:1px;min-width:104px;padding:8px 15px;color:#fff;background:#000;border:2px solid #ffcd02;border-radius:28px;box-shadow:0 3px 12px #0005;touch-action:none;user-select:none;cursor:grab;pointer-events:auto;text-align:left}
-.sywtc-clock__face:active{cursor:grabbing}
-.sywtc-clock__face:focus-visible{outline:3px solid #fff;box-shadow:0 0 0 6px #ffcd02}
-.sywtc-clock__time{font:600 15px/1.2 Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}
-.sywtc-clock__date{color:#ffcd02;font:13px/1.2 Barlow,Poppins,system-ui,sans-serif}
-.sywtc-clock__panel{position:absolute;right:0;bottom:calc(100% + 6px);width:min(300px,calc(100vw - 16px));display:grid;gap:8px;padding:12px 14px;border-radius:10px;background:#000;color:#fff;font-size:12px;box-shadow:0 8px 30px #0006;pointer-events:auto}
-.sywtc-clock__panel[hidden]{display:none}
-.sywtc-clock.is-below .sywtc-clock__panel{bottom:auto;top:calc(100% + 6px)}
-.sywtc-clock__panel strong{display:block;color:#ffcd02;font-weight:600;font-size:12px}
-.sywtc-clock__panel span{display:block}
-.sywtc-clock__now{font-size:14px}
-.sywtc-clock__company{padding-top:8px;border-top:1px solid #ffffff33;color:#d9d9d9}
-.sywtc-clock__panel label{display:grid;gap:4px;margin:0;font-weight:600;font-size:12px;color:#fff}
-.sywtc-clock__panel select{all:unset;box-sizing:border-box;width:100%;min-height:38px;padding:7px 10px;border-radius:6px;background:#fff;color:#000;font:14px Poppins,system-ui,sans-serif;cursor:pointer}
-.sywtc-clock__panel select:focus-visible,.sywtc-clock__reset:focus-visible{outline:3px solid #ffcd02;outline-offset:2px}
-.sywtc-clock__reset{all:unset;box-sizing:border-box;justify-self:start;padding:6px 10px;border:1px solid #ffcd02;border-radius:6px;color:#ffcd02;font:600 12px Poppins,system-ui,sans-serif;cursor:pointer}
-.sywtc-clock__reset[hidden]{display:none}
-.sywtc-clock__hint{color:#a8a8a8;font-size:11px}
+#sywtcClock{position:fixed;z-index:60;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));font-family:Poppins,system-ui,sans-serif;line-height:1.3;pointer-events:none}
+#sywtcClock *{box-sizing:border-box}
+#sywtcClock .sywtc-clock__face{all:unset;box-sizing:border-box;display:grid;gap:1px;min-width:104px;padding:8px 15px;color:#fff;background:#000;border:2px solid #ffcd02;border-radius:28px;box-shadow:0 3px 12px #0005;touch-action:none;user-select:none;cursor:grab;pointer-events:auto;text-align:left}
+#sywtcClock .sywtc-clock__face:active{cursor:grabbing}
+#sywtcClock .sywtc-clock__face:focus-visible{outline:3px solid #fff;box-shadow:0 0 0 6px #ffcd02}
+#sywtcClock .sywtc-clock__time{font:600 15px/1.2 Poppins,system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
+#sywtcClock .sywtc-clock__date{color:#ffcd02;font:13px/1.2 Barlow,Poppins,system-ui,sans-serif}
+#sywtcClock .sywtc-clock__panel{position:absolute;right:0;bottom:calc(100% + 6px);width:min(300px,calc(100vw - 16px));display:grid;gap:8px;padding:12px 14px;border-radius:10px;background:#000;color:#fff;font-size:12px;box-shadow:0 8px 30px #0006;pointer-events:auto}
+#sywtcClock .sywtc-clock__panel[hidden]{display:none}
+#sywtcClock.is-below .sywtc-clock__panel{bottom:auto;top:calc(100% + 6px)}
+#sywtcClock .sywtc-clock__panel strong{display:block;color:#ffcd02;font-weight:600;font-size:12px}
+#sywtcClock .sywtc-clock__panel span{display:block}
+#sywtcClock .sywtc-clock__now{font-size:14px;color:#fff}
+#sywtcClock .sywtc-clock__company{padding-top:8px;border-top:1px solid #ffffff33;color:#d9d9d9}
+#sywtcClock .sywtc-clock__panel label{display:grid;gap:4px;margin:0;font-weight:600;font-size:12px;color:#fff}
+#sywtcClock .sywtc-clock__panel select{all:unset;box-sizing:border-box;width:100%;min-height:38px;padding:7px 10px;border-radius:6px;background:#fff;color:#000;font:14px Poppins,system-ui,sans-serif;cursor:pointer}
+#sywtcClock .sywtc-clock__panel select:focus-visible,#sywtcClock .sywtc-clock__reset:focus-visible{outline:3px solid #ffcd02;outline-offset:2px}
+#sywtcClock .sywtc-clock__reset{all:unset;box-sizing:border-box;justify-self:start;padding:6px 10px;border:1px solid #ffcd02;border-radius:6px;color:#ffcd02;font:600 12px Poppins,system-ui,sans-serif;cursor:pointer}
+#sywtcClock .sywtc-clock__reset[hidden]{display:none}
+#sywtcClock .sywtc-clock__hint{color:#a8a8a8;font-size:11px}
 #main{padding-bottom:max(84px,var(--sywtc-clock-pad,0px))}
-@media (max-width:720px){.sywtc-clock{right:8px;bottom:max(8px,env(safe-area-inset-bottom))}.sywtc-clock__face{min-width:0;padding:6px 12px}.sywtc-clock__time{font-size:13px}.sywtc-clock__date{font-size:11px}}
-@media print{.sywtc-clock{display:none!important}}
+@media (max-width:720px){#sywtcClock{right:8px;bottom:max(8px,env(safe-area-inset-bottom))}#sywtcClock .sywtc-clock__face{min-width:0;padding:6px 12px}#sywtcClock .sywtc-clock__time{font-size:13px}#sywtcClock .sywtc-clock__date{font-size:11px}}
+@media print{#sywtcClock{display:none!important}}
 `;
 
 let mounted = null;
